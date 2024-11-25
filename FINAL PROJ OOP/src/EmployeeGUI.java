@@ -377,10 +377,6 @@ public class EmployeeGUI extends JFrame {
             double salary = Double.parseDouble(salaryField.getText());
             String hireDate = hireDateField.getText();
 
-            if (firstName.isEmpty() || lastName.isEmpty() || department.isEmpty() || position.isEmpty() || hireDate.isEmpty()) {
-                throw new IllegalArgumentException("All fields must be filled.");
-            }
-
             Employee newEmployee = new Employee(id, firstName, lastName, department, position, salary, hireDate);
             DatabaseUtil.addEmployee(newEmployee);
             updateEmployeeTable();
@@ -388,8 +384,6 @@ public class EmployeeGUI extends JFrame {
             clearFields();
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Invalid input. Please enter valid data.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
-        } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "An error occurred while adding the employee.", "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -406,10 +400,6 @@ public class EmployeeGUI extends JFrame {
             double salary = Double.parseDouble(salaryField.getText());
             String hireDate = hireDateField.getText();
 
-            if (firstName.isEmpty() || lastName.isEmpty() || department.isEmpty() || position.isEmpty() || hireDate.isEmpty()) {
-                throw new IllegalArgumentException("All fields must be filled.");
-            }
-
             Employee updatedEmployee = new Employee(id, firstName, lastName, department, position, salary, hireDate);
             DatabaseUtil.updateEmployee(updatedEmployee);
             updateEmployeeTable();
@@ -417,8 +407,6 @@ public class EmployeeGUI extends JFrame {
             clearFields();
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Invalid input. Please enter valid data.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
-        } catch (IllegalArgumentException ex) {
-            JOptionPane.showMessageDialog(this, ex.getMessage(), "Invalid Input", JOptionPane.ERROR_MESSAGE);
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "An error occurred while updating the employee.", "Error", JOptionPane.ERROR_MESSAGE);
         }
