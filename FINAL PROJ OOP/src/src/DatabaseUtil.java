@@ -9,6 +9,8 @@ public class DatabaseUtil {
     private static final String USER = "root"; // Change to your MySQL username
     private static final String PASSWORD = "115320"; // Change to your MySQL password
 
+    private static List<Employee> employees = new ArrayList<>();
+
     private static Connection getConnection() throws SQLException {
         try {
             return DriverManager.getConnection(URL, USER, PASSWORD);
@@ -19,7 +21,7 @@ public class DatabaseUtil {
 
     // Method to get all employees from the database
     public static List<Employee> getAllEmployees() {
-        List<Employee> employees = new ArrayList<>();
+        employees.clear();
         String query = "SELECT * FROM employees"; // Adjust the table name as needed
 
         try (Connection conn = getConnection();
@@ -138,4 +140,16 @@ public class DatabaseUtil {
         }
         return false;
     }
+
+public static void wipeAllEmployees() {
+    String query = "DELETE FROM employees";
+
+    try (Connection conn = getConnection();
+         Statement stmt = conn.createStatement()) {
+        stmt.executeUpdate(query);
+    } catch (SQLException e) {
+        e.printStackTrace();
+    }
+    employees.clear();
+}
 }

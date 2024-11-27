@@ -10,7 +10,7 @@ public class CreateAccountGUI extends JFrame {
     private JPasswordField confirmPassField;
 
     public CreateAccountGUI() {
-        setTitle("Create Account");
+        setTitle("MyManager : Salary Management System - Create Account");
         setSize(300, 200);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(null);

@@ -10,8 +10,8 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.List;
 import java.util.stream.Collectors;
-
-
+import java.io.FileWriter;
+import java.io.IOException;
 
 public class EmployeeGUI extends JFrame {
 
@@ -21,7 +21,7 @@ public class EmployeeGUI extends JFrame {
     private JTextField searchField, salaryFilterField;
 
     public EmployeeGUI() {
-        setTitle("Employee Management System");
+        setTitle("MyManager : Salary Management System");
         setSize(800, 600);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
@@ -98,7 +98,7 @@ public class EmployeeGUI extends JFrame {
             }
         });
 
-        // Add, Update, Delete buttons
+        // Add, Update, Delete, Wipe, Export buttons
         JButton addButton = new JButton("Add Employee");
         addButton.addActionListener(new ActionListener() {
             @Override
@@ -120,6 +120,34 @@ public class EmployeeGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 deleteEmployee();
+            }
+        });
+
+        JButton wipeButton = new JButton("Wipe Table");
+        wipeButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                wipeEmployeeTable();
+            }
+        });
+
+        JButton exportButton = new JButton("Export to CSV");
+        exportButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                exportToCSV();
+            }
+        });
+
+        JButton logoutButton = new JButton("Logout");
+        logoutButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                int response = JOptionPane.showConfirmDialog(null, "Are you sure you want to logout?", "Confirm Logout", JOptionPane.YES_NO_OPTION);
+                if (response == JOptionPane.YES_OPTION) {
+                    new LoginGUI().setVisible(true);
+                    dispose();
+                }
             }
         });
 
@@ -153,7 +181,10 @@ public class EmployeeGUI extends JFrame {
                                 .addComponent(addButton)
                                 .addComponent(updateButton)
                                 .addComponent(deleteButton)
-                                .addComponent(refreshButton)))
+                                .addComponent(refreshButton)
+                                .addComponent(wipeButton)
+                                .addComponent(exportButton)
+                                .addComponent(logoutButton)))
         );
 
         layout.setVerticalGroup(layout.createSequentialGroup()
@@ -190,7 +221,10 @@ public class EmployeeGUI extends JFrame {
                         .addComponent(addButton)
                         .addComponent(updateButton)
                         .addComponent(deleteButton)
-                        .addComponent(refreshButton))
+                        .addComponent(refreshButton)
+                        .addComponent(wipeButton)
+                        .addComponent(exportButton)
+                        .addComponent(logoutButton))
         );
 
         add(formPanel, BorderLayout.SOUTH);
@@ -243,7 +277,9 @@ public class EmployeeGUI extends JFrame {
         } catch (NumberFormatException ex) {
             JOptionPane.showMessageDialog(this, "Please enter a valid salary amount.", "Invalid Input", JOptionPane.ERROR_MESSAGE);
         }
-    }private void addEmployee() {
+    }
+
+    private void addEmployee() {
         try {
             int id = Integer.parseInt(idField.getText().trim());
             String firstName = firstNameField.getText().trim();
@@ -252,26 +288,26 @@ public class EmployeeGUI extends JFrame {
             String position = positionField.getText().trim();
             double salary = Double.parseDouble(salaryField.getText().trim());
             String hireDate = hireDateField.getText().trim();
-    
+
             if (!firstName.matches("[a-zA-Z ]+") || !lastName.matches("[a-zA-Z ]+")) {
                 throw new IllegalArgumentException("First name and Last name must contain only alphabetical characters and spaces.");
             }
-    
+
             if (firstName.isEmpty() || lastName.isEmpty() || department.isEmpty() || position.isEmpty() || hireDate.isEmpty()) {
                 throw new IllegalArgumentException("All fields must be filled.");
             }
-    
+
             // Validate hire date format (YYYY-MM-DD)
             if (!hireDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
                 throw new IllegalArgumentException("Hire date must be in the format YYYY-MM-DD.");
             }
-    
+
             // Check for duplicate ID
             List<Employee> employees = DatabaseUtil.getAllEmployees();
             if (employees.stream().anyMatch(e -> e.getId() == id)) {
                 throw new IllegalArgumentException("ID already exists. Please enter a unique ID.");
             }
-    
+
             Employee newEmployee = new Employee(id, firstName, lastName, department, position, salary, hireDate);
             DatabaseUtil.addEmployee(newEmployee);
             updateEmployeeTable();
@@ -285,6 +321,7 @@ public class EmployeeGUI extends JFrame {
             JOptionPane.showMessageDialog(this, "An error occurred while adding the employee.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
     private void updateEmployee() {
         try {
             int id = Integer.parseInt(idField.getText().trim());
@@ -294,20 +331,20 @@ public class EmployeeGUI extends JFrame {
             String position = positionField.getText().trim();
             double salary = Double.parseDouble(salaryField.getText().trim());
             String hireDate = hireDateField.getText().trim();
-    
+
             if (!firstName.matches("[a-zA-Z ]+") || !lastName.matches("[a-zA-Z ]+")) {
                 throw new IllegalArgumentException("First name and Last name must contain only alphabetical characters and spaces.");
             }
-    
+
             if (firstName.isEmpty() || lastName.isEmpty() || department.isEmpty() || position.isEmpty() || hireDate.isEmpty()) {
                 throw new IllegalArgumentException("All fields must be filled.");
             }
-    
+
             // Validate hire date format (YYYY-MM-DD)
             if (!hireDate.matches("\\d{4}-\\d{2}-\\d{2}")) {
                 throw new IllegalArgumentException("Hire date must be in the format YYYY-MM-DD.");
             }
-    
+
             Employee updatedEmployee = new Employee(id, firstName, lastName, department, position, salary, hireDate);
             DatabaseUtil.updateEmployee(updatedEmployee);
             updateEmployeeTable();
@@ -321,6 +358,7 @@ public class EmployeeGUI extends JFrame {
             JOptionPane.showMessageDialog(this, "An error occurred while updating the employee.", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
     private void deleteEmployee() {
         try {
             int id = Integer.parseInt(idField.getText());
@@ -333,7 +371,9 @@ public class EmployeeGUI extends JFrame {
         } catch (Exception ex) {
             JOptionPane.showMessageDialog(this, "An error occurred while deleting the employee.", "Error", JOptionPane.ERROR_MESSAGE);
         }
-    }    private void updateEmployeeTable() {
+    }
+
+    private void updateEmployeeTable() {
         List<Employee> employees = DatabaseUtil.getAllEmployees();
         tableModel.setEmployees(employees);
     }
@@ -346,6 +386,38 @@ public class EmployeeGUI extends JFrame {
         positionField.setText("");
         salaryField.setText("");
         hireDateField.setText("");
+    }
+
+    private void wipeEmployeeTable() {
+        int confirm = JOptionPane.showConfirmDialog(this, "Are you sure you want to wipe all employee data?", "Confirm Wipe", JOptionPane.YES_NO_OPTION);
+        if (confirm == JOptionPane.YES_OPTION) {
+            DatabaseUtil.wipeAllEmployees();
+            updateEmployeeTable();
+            JOptionPane.showMessageDialog(this, "All employee data wiped successfully.");
+        }
+    }
+
+    private void exportToCSV() {
+        String fileName = "employees.csv";
+        try (FileWriter fileWriter = new FileWriter(fileName)) {
+            // Write header
+            fileWriter.append("ID,First Name,Last Name,Department,Position,Salary,Hire Date\n");
+
+            // Write employee data
+            List<Employee> employees = DatabaseUtil.getAllEmployees();
+            for (Employee employee : employees) {
+                fileWriter.append(employee.getId() + ",");
+                fileWriter.append(employee.getFirstName() + ",");
+                fileWriter.append(employee.getLastName() + ",");
+                fileWriter.append(employee.getDepartment() + ",");
+                fileWriter.append(employee.getPosition() + ",");
+                fileWriter.append(employee.getSalary() + ",");
+                fileWriter.append(employee.getHireDate() + "\n");
+            }
+            JOptionPane.showMessageDialog(this, "Exported to CSV successfully.");
+        } catch (IOException e) {
+            JOptionPane.showMessageDialog(this, "Error writing to CSV file.", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     public static void main(String[] args) {

@@ -9,7 +9,7 @@ public class LoginGUI extends JFrame {
     private JPasswordField passField;
 
     public LoginGUI() {
-        setTitle("Login");
+        setTitle("MyManager : Salary Management System - Login");
         setSize(300, 200);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLocationRelativeTo(null);
